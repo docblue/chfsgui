@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>chfs_resource/chfs.exe</file>
+    </qresource>
+</RCC>

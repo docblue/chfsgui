@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="APP_LOGO">res/image/logo.ico</file>
+        <file>res/image/play.svg</file>
+        <file>res/image/stop.svg</file>
+        <file>res/image/menu.svg</file>
+        <file>res/image/return.svg</file>
+        <file alias="IM3">res/image/autoitem.svg</file>
+        <file alias="IM1">res/image/deleteitem.svg</file>
+        <file alias="IM0">res/image/newitem.svg</file>
+        <file alias="IM2">res/image/renameitem.svg</file>
+        <file alias="IM4">res/image/saveitem.svg</file>
+        <file>res/image/dir.svg</file>
+        <file>res/image/mask.svg</file>
+        <file>res/image/user.svg</file>
+        <file>res/image/tray_error.png</file>
+        <file>res/image/tray_running.png</file>
+    </qresource>
+</RCC>
