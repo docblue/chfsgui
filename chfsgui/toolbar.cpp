@@ -3,7 +3,7 @@
 #include <QToolButton>
 #include <QMenu>
 #include "mainwindow.h"
-#include <QSettings>
+#include "mysettings.h"
 #include "aboutdlg.h"
 
 Toolbar::Toolbar(QWidget *parent) : QWidget(parent)
@@ -71,6 +71,11 @@ void Toolbar::createActions()
 
     _btnMenu->setMenu(menu);
     _btnMenu->setPopupMode(QToolButton::InstantPopup);
+
+
+    connect(&MySettings::instance(),&MySettings::currentItemChanged,this,[=](QString key){
+        _labelItem->setText(key);
+    });
 }
 
 void Toolbar::paintEvent(QPaintEvent *)
@@ -108,12 +113,15 @@ void Toolbar::createContents()
     _btnMenu->setIconSize(QSize(32,32));
     _btnMenu->setToolTip(tr("菜单"));
 
+    _labelItem = new QLabel("",this);
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->setMargin(0);
     mainLayout->addWidget(_btnReturn);
     mainLayout->addWidget(_btnPlay);
     mainLayout->addWidget(_btnStop);
+    mainLayout->addStretch();
+     mainLayout->addWidget(_labelItem);
     mainLayout->addStretch();
     mainLayout->addWidget(_btnMenu);
 }

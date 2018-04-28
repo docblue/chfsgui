@@ -4,6 +4,7 @@
 #include <QWidget>
 class QToolButton;
 class QAction;
+class QLabel;
 
 
 struct ToolbarActions{
@@ -29,6 +30,7 @@ private:
     QToolButton* _btnPlay;
     QToolButton* _btnStop;
     QToolButton* _btnMenu;
+    QLabel* _labelItem;
 signals:
     void sigEditorMode();
     void sigRunningMode();

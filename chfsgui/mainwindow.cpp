@@ -12,7 +12,6 @@
 #include <QSystemTrayIcon>
 #include <QCloseEvent>
 
-
 QProcess g_chfsProcess;
 SomeActions someActions;
 
@@ -29,12 +28,13 @@ void setAppAutorun(bool isAuto)
     }
 }
 
+#define SETWINDOWSIZE()   setFixedSize(820,500)
 MainWindow::MainWindow(QWidget *parent)
     : QFrame(parent)
 {
     setWindowIcon(QIcon(":/APP_LOGO"));
     setWindowTitle("Cute HTTP File Server");
-    setFixedSize(800,500); //阻止界面初始化时让主窗口身材变形
+    SETWINDOWSIZE(); //阻止界面初始化时让主窗口身材变形
 
     //
     // create contents
@@ -74,7 +74,7 @@ MainWindow::MainWindow(QWidget *parent)
     // 设置窗口尺寸
     //
 
-    setMinimumSize(800,500);
+    SETWINDOWSIZE();
     setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 }
 
@@ -185,6 +185,6 @@ void MainWindow::onRunningMode()
 
     ui.configWgt->onRunningMode();
 
-    ui.trayicon->setIcon(QIcon(":/res/image/tray_running.png"));
+    ui.trayicon->setIcon(QIcon(":/res/image/tray_running.png"));    
 }
 

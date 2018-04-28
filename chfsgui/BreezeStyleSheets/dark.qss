@@ -1694,3 +1694,12 @@ CfgAllowip > QRadioButton:disabled
 {
     color: #8F948F;
 }
+
+Toolbar > QLabel
+{
+    background: transparent;
+    font-weight: bold;
+	color: #9FB4BF;
+	font-family: "黑体";
+	font-size: 14px;
+}

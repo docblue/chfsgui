@@ -2,6 +2,7 @@
 #include "precompile.h"
 #include "mysettings.h"
 #include <QFileDialog>
+#include <QDesktopServices>
 
 
 CfgSharedpathWgt::CfgSharedpathWgt(QWidget *parent) : CfgBase(parent)
@@ -31,15 +32,19 @@ CfgSharedpathWgt::CfgSharedpathWgt(QWidget *parent) : CfgBase(parent)
 
 void CfgSharedpathWgt::onEditorMode()
 {
-    _editPath->setEnabled(_currentKey != DEFAULTITEM);
+    _editPath->setReadOnly(_currentKey != DEFAULTITEM);
+    _btnChoose->setText(tr("浏览"));
     _btnChoose->setVisible(_currentKey != DEFAULTITEM);
     _labelNote->setVisible(true);
 }
 
 void CfgSharedpathWgt::onRunningMode()
 {
-    _editPath->setEnabled(false);
-    _btnChoose->setVisible(false);
+    _editPath->setReadOnly(true);
+    _editPath->clearFocus();
+    _btnChoose->setText(tr("打开"));
+    _btnChoose->clearFocus();
+    _btnChoose->setVisible(true);
     _labelNote->setVisible(false);
 }
 
@@ -68,12 +73,17 @@ void CfgSharedpathWgt::onCurrentItemChanged(QString key)
 
 void CfgSharedpathWgt::onPathChanging()
 {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("选择共享目录"),
-                                                    "",
-                                                    QFileDialog::ShowDirsOnly
-                                                    | QFileDialog::DontResolveSymlinks);
-    if(dir.isEmpty()==false){
-        _editPath->setText(dir);
-        MySettings::instance().setPathValue(_currentKey, dir);
+    const QString flag = _btnChoose->text();
+    if( flag == tr("浏览") ){
+        QString dir = QFileDialog::getExistingDirectory(this, tr("选择共享目录"),
+                                                        "",
+                                                        QFileDialog::ShowDirsOnly
+                                                        | QFileDialog::DontResolveSymlinks);
+        if(dir.isEmpty()==false){
+            _editPath->setText(dir);
+            MySettings::instance().setPathValue(_currentKey, dir);
+        }
+    }else{
+        QDesktopServices::openUrl(QUrl(_editPath->text()));
     }
 }
