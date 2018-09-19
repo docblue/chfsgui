@@ -4,6 +4,7 @@
 #include "uicomponents/qrpopup.h"
 #include <QTextBrowser>
 #include <QMouseEvent>
+#include <QListWidget>
 
 class MyTextBrowser : public QTextBrowser
 {
@@ -45,6 +46,22 @@ signals:
 
 public slots:
 };
+
+
+
+class LogWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit LogWidget(QWidget *parent = 0);
+    void paintEvent(QPaintEvent *) override;
+    QListWidget* logList;
+signals:
+
+public slots:
+
+};
+
 
 class MonitorWgt : public QWidget
 {

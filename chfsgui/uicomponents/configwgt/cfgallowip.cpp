@@ -1,6 +1,5 @@
 #include "cfgallowip.h"
 #include "precompile.h"
-#include "mysettings.h"
 #include <QRadioButton>
 #include <QListWidget>
 #include <QRegExpValidator>
@@ -167,44 +166,27 @@ CfgAllowip::CfgAllowip(QWidget *parent) : CfgBase(parent)
     mainLayout->addLayout( btnsLayout );
     mainLayout->addLayout( listLayout, 1 );
 
+    initIPs();
+
     //
     // connections
     //
 
-    connect(&MySettings::instance(),&MySettings::currentItemChanged,this,[=](QString key){
-        _listWgt->clear();
-        _currentKey = key;
-
-        QString allow = MySettings::instance().getAllowValue(key);
-        if( allow.isEmpty() ){
-            _btnBlack->setChecked( true );
-        }else{
-            QString ips(allow);
-            if(allow.startsWith("not",Qt::CaseInsensitive)){
-                 _btnBlack->setChecked( true );
-                 ips = allow.mid(4, allow.length()-5);
-            }else{
-                 _btnWhite->setChecked( true );
-            }
-
-            _listWgt->addItems(ips.split(","));
-        }
-    });
 
     connect(_btnBlack,&QRadioButton::clicked,this,[=](){
         QString ips = QString("not(%1)").arg(collectAllItems());
-        MySettings::instance().setAllowValue(_currentKey, ips);
+        g_settings.setValue(PARAM_ALLOW,ips);
     });
 
     connect(_btnWhite,&QRadioButton::clicked,this,[=](){
-        MySettings::instance().setAllowValue(_currentKey, collectAllItems());
+        g_settings.setValue(PARAM_ALLOW,collectAllItems());
     });
 
     connect(_btnNew,&QPushButton::clicked,this,[=](){
         AllowipDlg dlg(NEWALLOWIP,"",this);
         if( QDialog::Accepted == dlg.exec() ){
             _listWgt->addItem(dlg.ips);
-            MySettings::instance().setAllowValue(_currentKey, _btnBlack->isChecked()?QString("not(%1)").arg(collectAllItems()):collectAllItems());
+            g_settings.setValue(PARAM_ALLOW, _btnBlack->isChecked()?QString("not(%1)").arg(collectAllItems()):collectAllItems());
         }
     });
     connect(_btnRemove,&QPushButton::clicked,this,[=](){
@@ -214,7 +196,7 @@ CfgAllowip::CfgAllowip(QWidget *parent) : CfgBase(parent)
             if( chosen == QMessageBox::Yes ){
                 _listWgt->removeItemWidget(currentItem);
                 delete currentItem;
-                MySettings::instance().setAllowValue(_currentKey, _btnBlack->isChecked()?QString("not(%1)").arg(collectAllItems()):collectAllItems());
+                g_settings.setValue(PARAM_ALLOW, _btnBlack->isChecked()?QString("not(%1)").arg(collectAllItems()):collectAllItems());
             }
         }
     });
@@ -226,7 +208,7 @@ CfgAllowip::CfgAllowip(QWidget *parent) : CfgBase(parent)
                 _listWgt->addItem(dlg.ips);
                 _listWgt->removeItemWidget(currentItem);
                 delete currentItem;
-                MySettings::instance().setAllowValue(_currentKey, _btnBlack->isChecked()?QString("not(%1)").arg(collectAllItems()):collectAllItems());
+                g_settings.setValue(PARAM_ALLOW, _btnBlack->isChecked()?QString("not(%1)").arg(collectAllItems()):collectAllItems());
             }
         }
     });
@@ -235,9 +217,29 @@ CfgAllowip::CfgAllowip(QWidget *parent) : CfgBase(parent)
         if( chosen == QMessageBox::Yes ){
             _listWgt->clear();
             _btnBlack->setChecked(true);
-            MySettings::instance().setAllowValue(_currentKey, "");
+            g_settings.setValue(PARAM_ALLOW,"");
         }
     });
+}
+
+void CfgAllowip::initIPs()
+{
+    _listWgt->clear();
+
+    QString allow = g_settings.value(PARAM_ALLOW).toString();
+    if( allow.isEmpty() ){
+        _btnBlack->setChecked( true );
+    }else{
+        QString ips(allow);
+        if(allow.startsWith("not",Qt::CaseInsensitive)){
+             _btnBlack->setChecked( true );
+             ips = allow.mid(4, allow.length()-5);
+        }else{
+             _btnWhite->setChecked( true );
+        }
+
+        _listWgt->addItems(ips.split(","));
+    }
 }
 
 QString CfgAllowip::collectAllItems()

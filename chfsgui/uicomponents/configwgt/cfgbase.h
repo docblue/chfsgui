@@ -11,7 +11,7 @@ public:
     virtual void onEditorMode() = 0;
     virtual void onRunningMode() = 0;
 protected:
-    QString _currentKey;
+
 signals:
 
 public slots:

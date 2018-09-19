@@ -16,7 +16,7 @@ QTPLUGIN  += qsvg
 PRECOMPILED_HEADER = preCompile.h
 CONFIG += c++11
 
-DEFINES += "GUIVER=1"
+DEFINES += "GUIVER=0"
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -24,8 +24,6 @@ SOURCES += main.cpp\
     toolbar.cpp \
     configwgt.cpp \
     monitorwgt.cpp \
-    launcheritemswgt.cpp \
-    mysettings.cpp \
     uicomponents/configwgt/cfgsharedpathwgt.cpp \
     uicomponents/configwgt/cfgallowip.cpp \
     uicomponents/configwgt/cfgrules.cpp \
@@ -51,8 +49,6 @@ HEADERS  += mainwindow.h \
     toolbar.h \
     configwgt.h \
     monitorwgt.h \
-    launcheritemswgt.h \
-    mysettings.h \
     uicomponents/configwgt/cfgsharedpathwgt.h \
     uicomponents/configwgt/cfgallowip.h \
     uicomponents/configwgt/cfgrules.h \
@@ -73,7 +69,8 @@ HEADERS  += mainwindow.h \
 RESOURCES += \
     chfs.qrc \
     gui.qrc \
-    BreezeStyleSheets\breeze.qrc
+    BreezeStyleSheets\breeze.qrc \
+    skin/qss.qrc
 
 FORMS += \
     aboutdlg.ui

@@ -15,6 +15,7 @@ public:
 private:
     QCheckBox* _cbRead;
     QCheckBox* _cbWrite;
+    QCheckBox* _cbDelete;
 signals:
 
 public slots:

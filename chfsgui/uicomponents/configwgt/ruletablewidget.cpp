@@ -1,15 +1,18 @@
 #include "ruletablewidget.h"
 #include "precompile.h"
+#include "utilities.h"
 
 MaskCellWidget::MaskCellWidget(QWidget *parent):QWidget(parent)
 {
     _cbRead = new QCheckBox(tr("读"),this);
     _cbWrite = new QCheckBox(tr("写"),this);
+    _cbDelete = new QCheckBox(tr("删除 "),this);
     auto maskLayout = new QHBoxLayout(this);
-    maskLayout->setMargin(2);
+    maskLayout->setMargin(0);
     maskLayout->addWidget( _cbRead );
     maskLayout->addWidget( _cbWrite );
-    maskLayout->addStretch(1);
+    maskLayout->addWidget( _cbDelete );
+    maskLayout->addSpacing(16);
 }
 
 void MaskCellWidget::setMask(bool r, bool w)
@@ -20,12 +23,7 @@ void MaskCellWidget::setMask(bool r, bool w)
 
 QString MaskCellWidget::getMask()
 {
-    if( _cbWrite->isChecked() )
-        return "RW";
-    else if( _cbRead->isChecked() )
-        return "R";
-    else
-        return "";
+    return makeRW(_cbRead->isChecked(),_cbWrite->isChecked(),_cbDelete->isChecked());
 }
 
 RuleTableWidget::RuleTableWidget(QWidget *parent) : QTableWidget(parent)
@@ -51,6 +49,8 @@ QTableWidgetItem* RuleTableWidget::addRuleRow(QString dir, bool r, bool w)
     auto maskWidget = new MaskCellWidget(this);
     maskWidget->setMask(r, w);
     setCellWidget(newRowCount-1, 1, maskWidget);
+
+    this->resizeColumnToContents(1);
 
     return (newItem);
 }

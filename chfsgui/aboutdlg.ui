@@ -55,7 +55,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;该程序是&lt;a href=&quot;http://iscute.me/chfs&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#00aa00;&quot;&gt;chfs&lt;/span&gt;&lt;/a&gt;程序的一个GUI封装，以满足部分用户的操作需求。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;该程序是&lt;a href=&quot;http://iscute.cn/chfs&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#00aa00;&quot;&gt;chfs&lt;/span&gt;&lt;/a&gt;程序的一个GUI封装，以满足部分用户的操作需求。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="openExternalLinks">
         <bool>true</bool>

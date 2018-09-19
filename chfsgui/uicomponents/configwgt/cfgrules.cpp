@@ -1,6 +1,5 @@
 #include "cfgrules.h"
 #include "precompile.h"
-#include "mysettings.h"
 #include <QListWidget>
 #include <QTreeView>
 #include <QHeaderView>
@@ -16,28 +15,29 @@ CfgRules::CfgRules(QWidget *parent) : CfgBase(parent)
 {
     createContents();
 
+    initAccList();
+
     //
     // connections
     //
 
     connect(_accList, &QListWidget::currentRowChanged,this,&CfgRules::accChanged);
-    connect(&MySettings::instance(),&MySettings::currentItemChanged,this,&CfgRules::launchitemChanged);
     connect(_btnAccNew,&QPushButton::clicked,this,[=](){
-        AccDlg dlg(_currentKey,"",this);
+        AccDlg dlg("",this);
         dlg.exec();
 
         int oldRow = _accList->currentRow();
-        launchitemChanged(_currentKey);
+        initAccList();
         _accList->setCurrentRow( oldRow );
     });
     connect(_btnAccModify,&QPushButton::clicked,this,[=](){
         auto item = _accList->currentItem();
         if(item){
-            AccDlg dlg(_currentKey,item->data(Qt::UserRole).toString(),this);
+            AccDlg dlg(item->data(Qt::UserRole).toString(),this);
             dlg.exec();
 
             int oldRow = _accList->currentRow();
-            launchitemChanged(_currentKey);
+            initAccList();
             _accList->setCurrentRow( oldRow );
         }
     });
@@ -48,17 +48,16 @@ CfgRules::CfgRules(QWidget *parent) : CfgBase(parent)
             QMessageBox::StandardButton chosen = QMessageBox::question(this,tr("警告"),tr("确定删除所选账户？"));
             if( chosen == QMessageBox::Yes ){
                 delete _accList->takeItem(_accList->currentRow());
-                MySettings::instance().removeUser(_currentKey,currentUser);
+                removeUser(currentUser);
             }
         }
     });
 }
 
-void CfgRules::launchitemChanged(QString key)
+void CfgRules::initAccList()
 {
     _accList->clear();
-    _currentKey = key;
-    auto accs = MySettings::instance().getAccsFromRulestr(key);
+    auto accs = getAccsFromRulestr();
 
     QListWidgetItem* item = new QListWidgetItem(tr("访客"));
     item->setData(Qt::UserRole,GUESTUSER);
@@ -81,7 +80,7 @@ void CfgRules::accChanged()
 
     auto item = _accList->currentItem();
     if(item){
-        auto rules = MySettings::instance().getRulesFromRulestr(_currentKey, item->data(Qt::UserRole).toString());
+        auto rules = getRulesFromRulestr(item->data(Qt::UserRole).toString());
 
         QTreeWidgetItem *root = new QTreeWidgetItem((QTreeWidget*)0,QStringList{ROOTPATH,rule2humanbeings(rules[ROOTPATH])});
         auto i = rules.constBegin();

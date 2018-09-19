@@ -1,24 +1,26 @@
 #include "cfgportwgt.h"
 #include "precompile.h"
-#include "mysettings.h"
 
 
 CfgPortWgt::CfgPortWgt(QWidget *parent) : CfgBase(parent)
 {
     _editPort = new QLineEdit(this);
     _editPort->setFixedWidth(48);
-    _editPort->setInputMask("00000");
+    _editPort->setInputMask("99999");
+    QString port = g_settings.value(PARAM_PORT).toString();
+    if( port.isEmpty() ){
+        port = "80";
+        g_settings.setValue(PARAM_PORT, port);
+    }
+    _editPort->setText( port );
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setMargin(0);
     mainLayout->addWidget( _editPort );
 
-    connect(&MySettings::instance(),&MySettings::currentItemChanged,this,[=](QString key){
-        _currentKey = key;
-        _editPort->setText( MySettings::instance().getPortValue(key));
-    });
-    connect(_editPort,&QLineEdit::editingFinished,this,[=](){
-        MySettings::instance().setPortValue(_currentKey, _editPort->text());
+
+    connect(_editPort,&QLineEdit::textEdited,this,[=](){
+        g_settings.setValue(PARAM_PORT, _editPort->text());
     });
 }
 

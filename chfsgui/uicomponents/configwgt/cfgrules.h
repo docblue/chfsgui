@@ -29,7 +29,7 @@ signals:
 
 public slots:
     void accChanged();
-    void launchitemChanged(QString key);
+    void initAccList();
 };
 
 #endif // CFGRULES_H

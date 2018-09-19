@@ -3,12 +3,14 @@
 #include <QToolButton>
 #include <QMenu>
 #include "mainwindow.h"
-#include "mysettings.h"
 #include "aboutdlg.h"
+#include <QTimer>
+#include <QFileDialog>
 
 Toolbar::Toolbar(QWidget *parent) : QWidget(parent)
 {
-    setFixedHeight(48);
+    setFixedHeight(50);
+    setProperty("form","title");
 
     createContents();
     initState();
@@ -24,13 +26,9 @@ Toolbar::Toolbar(QWidget *parent) : QWidget(parent)
     });
 
     void (QProcess::* signalFinished)(int,QProcess::ExitStatus) = &QProcess::finished;
-    connect(&g_chfsProcess,signalFinished,this,[=](){
-        if( g_chfsProcess.exitStatus() == QProcess::CrashExit){ //手动KILL进程
-            initState();
-            emit sigEditorMode();
-        }else{
-            stopState();
-        }
+    connect(&g_chfsProcess,signalFinished,this,[=](){        
+        initState();
+        emit sigEditorMode();
     });
 
     connect(_btnPlay,&QToolButton::clicked,this,&Toolbar::sigFireLaunch);
@@ -38,11 +36,11 @@ Toolbar::Toolbar(QWidget *parent) : QWidget(parent)
         g_chfsProcess.kill();
     });
 
-    connect(_btnReturn,&QToolButton::clicked,this,[=](){
-        initState();
-        emit sigEditorMode();
-    });
-
+    if( g_settings.value(PARAM_AUTO_LAUNCHE).toBool() ){
+        QTimer::singleShot(800,[=](){
+            emit sigFireLaunch();
+        });
+    }
 
     //
     //  actions
@@ -71,11 +69,6 @@ void Toolbar::createActions()
 
     _btnMenu->setMenu(menu);
     _btnMenu->setPopupMode(QToolButton::InstantPopup);
-
-
-    connect(&MySettings::instance(),&MySettings::currentItemChanged,this,[=](QString key){
-        _labelItem->setText(key);
-    });
 }
 
 void Toolbar::paintEvent(QPaintEvent *)
@@ -88,62 +81,85 @@ void Toolbar::paintEvent(QPaintEvent *)
 
 void Toolbar::createContents()
 {
-    _btnReturn = new QToolButton(this);
-    _btnReturn->setFixedSize(48,48);
-    _btnReturn->setIcon(QIcon(":/res/image/return.svg"));
-    _btnReturn->setIconSize(QSize(32,32));
-    _btnReturn->setToolTip(tr("返回"));
+    const int BTNSIZE = 42;
 
     _btnPlay = new QToolButton(this);
-    _btnPlay->setFixedSize(48,48);
+    _btnPlay->setFixedSize(BTNSIZE,BTNSIZE);
     _btnPlay->setIcon(QIcon(":/res/image/play.svg"));
     _btnPlay->setIconSize(QSize(32,32));
     _btnPlay->setToolTip(tr("运行"));
 
 
     _btnStop = new QToolButton(this);
-    _btnStop->setFixedSize(48,48);
+    _btnStop->setFixedSize(BTNSIZE,BTNSIZE);
     _btnStop->setIcon(QIcon(":/res/image/stop.svg"));
     _btnStop->setIconSize(QSize(32,32));
     _btnStop->setToolTip(tr("停止运行"));
 
+    _btnSave = new QToolButton(this);
+    _btnSave->setFixedSize(BTNSIZE,BTNSIZE);
+    _btnSave->setIcon(QIcon(":/res/image/save.svg"));
+    _btnSave->setIconSize(QSize(32,32));
+    _btnSave->setToolTip(tr("将当前配置保存为命令行程序的配置文件"));
+    connect(_btnSave,&QToolButton::clicked,[=](){
+        QString fileName = QFileDialog::getSaveFileName(this, tr("保存配置"),"","ini(*.ini);;Text(*.txt);;*(*.*)");
+        if( fileName.isEmpty() == false ){
+            QFile file(fileName);
+            if (!file.open(QIODevice::ReadWrite | QIODevice::Text)){
+                QMessageBox::critical(this,tr("提示"),tr("保存失败！"));
+                return;
+            }
+
+            QTextStream out(&file);
+            out << "port=" << g_settings.value(PARAM_PORT).toString() << endl;
+            out << "path=" << g_settings.value(PARAM_PATH).toString() << endl;
+            out << "allow=" << g_settings.value(PARAM_ALLOW).toString() << endl;
+            auto rules = g_settings.value(PARAM_RULE).toString().split("|");
+            for(auto r: rules){
+                if( r.isEmpty() == false )
+                    out << "rule=" << r << endl;
+            }
+        }
+    });
+
     _btnMenu = new QToolButton(this);
-    _btnMenu->setFixedSize(48,48);
+    _btnMenu->setFixedSize(BTNSIZE,BTNSIZE);
     _btnMenu->setIcon(QIcon(":/res/image/menu.svg"));
     _btnMenu->setIconSize(QSize(32,32));
     _btnMenu->setToolTip(tr("菜单"));
 
-    _labelItem = new QLabel("",this);
+    _btnAuto = new QCheckBox(tr("随软件启动运行服务"), this);
+    _btnAuto->setChecked( g_settings.value(PARAM_AUTO_LAUNCHE).toBool() );
+    connect(_btnAuto,&QCheckBox::clicked,this,[=](){
+        g_settings.setValue(PARAM_AUTO_LAUNCHE,_btnAuto->isChecked());
+    });
+
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
-    mainLayout->setMargin(0);
-    mainLayout->addWidget(_btnReturn);
+    mainLayout->setContentsMargins(5,1,5,1);
     mainLayout->addWidget(_btnPlay);
     mainLayout->addWidget(_btnStop);
     mainLayout->addStretch();
-     mainLayout->addWidget(_labelItem);
-    mainLayout->addStretch();
+    mainLayout->addWidget(_btnAuto);
+    mainLayout->addWidget(_btnSave);
     mainLayout->addWidget(_btnMenu);
 }
 
 
 void Toolbar::initState()
 {
-    _btnReturn->hide();
     _btnPlay->show();
     _btnStop->hide();
 }
 
 void Toolbar::runningState()
 {
-    _btnReturn->hide();
     _btnPlay->hide();
     _btnStop->show();
 }
 
 void Toolbar::stopState()
 {
-    _btnReturn->show();
     _btnPlay->show();
     _btnStop->hide();
 }

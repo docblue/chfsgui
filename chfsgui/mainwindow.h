@@ -5,7 +5,6 @@
 
 
 class Toolbar;
-class LauncherItemsWgt;
 class ConfigWgt;
 class MonitorWgt;
 class QHBoxLayout;
@@ -16,7 +15,6 @@ class QSystemTrayIcon;
 
 struct MainWindowUIComponents{
     Toolbar* toolbarWgt;
-    LauncherItemsWgt* launcherWgt;
     ConfigWgt* configWgt;
     MonitorWgt* monitorWgt;
     QHBoxLayout* contentLayout;

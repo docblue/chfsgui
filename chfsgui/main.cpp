@@ -5,6 +5,10 @@
 #include <QTextStream>
 #include "processdecorator.h"
 #include "qtsingleapplication/qtsingleapplication.h"
+#include <QStandardPaths>
+#include <QDir>
+
+QString logPathRoot;
 
 int main(int argc, char *argv[])
 {
@@ -20,8 +24,14 @@ int main(int argc, char *argv[])
     }
 
 
+    //日志目录
+
+    logPathRoot = QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation)[0];
+    QDir().mkpath(logPathRoot);
+
+
     // set stylesheet
-    QFile file(":/dark.qss");
+    QFile file(":/qss/flatblack.css");
     file.open(QFile::ReadOnly | QFile::Text);
     QTextStream stream(&file);
     a.setStyleSheet(stream.readAll());

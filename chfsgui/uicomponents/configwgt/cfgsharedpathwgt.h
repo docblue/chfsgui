@@ -18,11 +18,9 @@ public:
 private:
     QLineEdit* _editPath;
     QPushButton* _btnChoose;
-    QLabel* _labelNote;
 signals:
 
 public slots:
-    void onCurrentItemChanged(QString key);
     void onPathChanging();
 };
 

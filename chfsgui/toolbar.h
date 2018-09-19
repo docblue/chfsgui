@@ -5,6 +5,7 @@
 class QToolButton;
 class QAction;
 class QLabel;
+class QCheckBox;
 
 
 struct ToolbarActions{
@@ -26,11 +27,11 @@ public:
     void stopState();
     void createActions();
 private:
-    QToolButton* _btnReturn;
     QToolButton* _btnPlay;
     QToolButton* _btnStop;
     QToolButton* _btnMenu;
-    QLabel* _labelItem;
+    QToolButton* _btnSave;
+    QCheckBox* _btnAuto;
 signals:
     void sigEditorMode();
     void sigRunningMode();

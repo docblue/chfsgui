@@ -8,24 +8,30 @@ class RuleTableWidget;
 class QMenu;
 class QAction;
 
+
+struct AccDlgUIComponents{
+    QLineEdit* editUser;
+    QLineEdit* editPwd;
+    QPushButton* btnOK;
+    QPushButton* _btnCancel;
+    QCheckBox* cbRead;
+    QCheckBox* cbWrite;
+    QCheckBox* cbDelete;
+    QPushButton* btnNew;
+    QPushButton* btnRemove;
+    RuleTableWidget* maskTable;
+    QMenu* addMenu;
+};
+
 class AccDlg : public QDialog
 {
     Q_OBJECT
 public:
 
-    explicit AccDlg(QString key, QString acc = "" /*用来标识是添加还是修改*/, QWidget *parent = 0);
+    explicit AccDlg(QString acc = "" /*用来标识是添加还是修改*/, QWidget *parent = 0);
 
 private:
-    QLineEdit* _editUser;
-    QLineEdit* _editPwd;
-    QPushButton* _btnOK;
-    QPushButton* _btnCancel;
-    QCheckBox* _cbRead;
-    QCheckBox* _cbWrite;
-    QPushButton* _btnNew;
-    QPushButton* _btnRemove;
-    RuleTableWidget* _maskTable;
-    QMenu* _addMenu;
+    AccDlgUIComponents ui;
     QAction* _chooseAction;
     QAction* _typeAction;
 

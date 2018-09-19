@@ -37,6 +37,7 @@ public:
 protected:
     QString collectAllItems();
     void onModeChanged(bool isEditor);
+    void initIPs();
 private:
     QListWidget* _listWgt;
 

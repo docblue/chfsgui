@@ -9,6 +9,7 @@
 ConfigWgt::ConfigWgt(QWidget *parent) : QWidget(parent)
 {
     createComponents();
+    setProperty("form","true");
 }
 
 void ConfigWgt::paintEvent(QPaintEvent *)
@@ -35,7 +36,7 @@ void ConfigWgt::onRunningMode()
     }
 }
 
-//TODO: 先凑合下。如果后期增加配置项，则必须要加上滚动条了
+
 void ConfigWgt::createComponents()
 {
     const int ITEM_LEFT_OFFSET = 26;
@@ -66,15 +67,6 @@ void ConfigWgt::createComponents()
     portLayout->addWidget( _portWgt );
     portLayout->addStretch(1);
 
-    // 地址过滤
-
-    QHBoxLayout* allowLabelLayout = new QHBoxLayout;
-    allowLabelLayout->addWidget(new QLabel(tr("地址过滤"),this));
-    allowLabelLayout->addStretch(1);
-
-    QHBoxLayout* allowLayout = new QHBoxLayout;
-    allowLayout->setContentsMargins(ITEM_LEFT_OFFSET,0,0,0);
-    allowLayout->addWidget(_allowWgt,1);
 
     // 账户控制
 
@@ -87,8 +79,19 @@ void ConfigWgt::createComponents()
     rulesLayout->addWidget(_rulesWgt,1);
 
 
+    // 地址过滤
+
+    QHBoxLayout* allowLabelLayout = new QHBoxLayout;
+    allowLabelLayout->addWidget(new QLabel(tr("地址过滤"),this));
+    allowLabelLayout->addStretch(1);
+
+    QHBoxLayout* allowLayout = new QHBoxLayout;
+    allowLayout->setContentsMargins(ITEM_LEFT_OFFSET,0,0,0);
+    allowLayout->addWidget(_allowWgt,1);
+
+
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(26,0,16,0);
+    mainLayout->setContentsMargins(5,0,5,0);
     mainLayout->setSpacing(6);
     mainLayout->addSpacing(12);
     mainLayout->addLayout(pathLabelLayout);
@@ -97,11 +100,11 @@ void ConfigWgt::createComponents()
     mainLayout->addLayout(portLabelLayout);
     mainLayout->addLayout(portLayout);
     mainLayout->addSpacing(12);
-    mainLayout->addLayout(allowLabelLayout);
-    mainLayout->addLayout(allowLayout, 1);
-    mainLayout->addSpacing(12);
     mainLayout->addLayout(rulesLabelLayout);
     mainLayout->addLayout(rulesLayout, 2);
+    mainLayout->addSpacing(12);
+    mainLayout->addLayout(allowLabelLayout);
+    mainLayout->addLayout(allowLayout, 1);
     mainLayout->addSpacing(6);
 }
 

@@ -1,6 +1,5 @@
 #include "cfgsharedpathwgt.h"
 #include "precompile.h"
-#include "mysettings.h"
 #include <QFileDialog>
 #include <QDesktopServices>
 
@@ -8,34 +7,32 @@
 CfgSharedpathWgt::CfgSharedpathWgt(QWidget *parent) : CfgBase(parent)
 {
     _editPath = new QLineEdit(this);
+    QString currentPath = g_settings.value(PARAM_PATH).toString();
+    if( currentPath.isEmpty() ){
+        currentPath = QApplication::applicationDirPath();
+        g_settings.setValue(PARAM_PATH, currentPath);
+    }
+    _editPath->setText( currentPath );
+
     _btnChoose = new QPushButton(tr("浏览"), this);
-    _labelNote = new QLabel(tr("注：‘默认启动项’的共享目录不可手动更改，仅随程序目录改变而改变"),this);
 
-    QHBoxLayout* editLayout = new QHBoxLayout;
-    editLayout->setMargin(0);
-    editLayout->addWidget( _editPath, 3);
-    editLayout->addWidget( _btnChoose );
-    editLayout->addStretch(1);
-
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->setMargin(0);
-    mainLayout->addLayout(editLayout);
-    mainLayout->addWidget( _labelNote );
+    mainLayout->addWidget( _editPath, 3);
+    mainLayout->addWidget( _btnChoose );
     mainLayout->addStretch(1);
 
-    connect(&MySettings::instance(),&MySettings::currentItemChanged,this,&CfgSharedpathWgt::onCurrentItemChanged);
     connect(_btnChoose,&QPushButton::clicked,this,&CfgSharedpathWgt::onPathChanging);
     connect(_editPath,&QLineEdit::textEdited,this,[=](QString path){
-        MySettings::instance().setPathValue(_currentKey, path);
+        g_settings.setValue(PARAM_PATH, path);
     });
 }
 
 void CfgSharedpathWgt::onEditorMode()
 {
-    _editPath->setReadOnly(_currentKey != DEFAULTITEM);
+    _editPath->setReadOnly( false );
     _btnChoose->setText(tr("浏览"));
-    _btnChoose->setVisible(_currentKey != DEFAULTITEM);
-    _labelNote->setVisible(true);
+    _btnChoose->setVisible( true );
 }
 
 void CfgSharedpathWgt::onRunningMode()
@@ -45,7 +42,6 @@ void CfgSharedpathWgt::onRunningMode()
     _btnChoose->setText(tr("打开"));
     _btnChoose->clearFocus();
     _btnChoose->setVisible(true);
-    _labelNote->setVisible(false);
 }
 
 void CfgSharedpathWgt::paintEvent(QPaintEvent *)
@@ -56,20 +52,7 @@ void CfgSharedpathWgt::paintEvent(QPaintEvent *)
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
-void CfgSharedpathWgt::onCurrentItemChanged(QString key)
-{
-    _currentKey = key;
 
-    _editPath->setEnabled(key != DEFAULTITEM);
-    _btnChoose->setVisible(key != DEFAULTITEM);
-    _labelNote->setVisible(key == DEFAULTITEM);
-
-    if(key == DEFAULTITEM){
-        _editPath->setText( QApplication::applicationDirPath() );
-    }else{
-        _editPath->setText(MySettings::instance().getPathValue(key));
-    }
-}
 
 void CfgSharedpathWgt::onPathChanging()
 {
@@ -81,7 +64,7 @@ void CfgSharedpathWgt::onPathChanging()
                                                         | QFileDialog::DontResolveSymlinks);
         if(dir.isEmpty()==false){
             _editPath->setText(dir);
-            MySettings::instance().setPathValue(_currentKey, dir);
+            g_settings.setValue(PARAM_PATH, dir);
         }
     }else{
         QDesktopServices::openUrl(QUrl(_editPath->text()));

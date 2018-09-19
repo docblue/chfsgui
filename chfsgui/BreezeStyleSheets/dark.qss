@@ -1703,3 +1703,8 @@ Toolbar > QLabel
 	font-family: "黑体";
 	font-size: 14px;
 }
+
+MaskCellWidget > QCheckBox
+{
+	background: transparent;
+}

@@ -3,10 +3,8 @@
 #include <QDesktopWidget>
 #include <QApplication>
 #include "toolbar.h"
-#include "launcheritemswgt.h"
 #include "configwgt.h"
 #include "monitorwgt.h"
-#include "mysettings.h"
 #include <QMenu>
 #include <QDir>
 #include <QSystemTrayIcon>
@@ -14,6 +12,7 @@
 
 QProcess g_chfsProcess;
 SomeActions someActions;
+QSettings g_settings(APPDOMAIN, APPKEY);
 
 
 void setAppAutorun(bool isAuto)
@@ -28,13 +27,14 @@ void setAppAutorun(bool isAuto)
     }
 }
 
-#define SETWINDOWSIZE()   setFixedSize(820,500)
+#define SETWINDOWSIZE()   setFixedSize(850,550)
 MainWindow::MainWindow(QWidget *parent)
     : QFrame(parent)
 {
     setWindowIcon(QIcon(":/APP_LOGO"));
     setWindowTitle("Cute HTTP File Server");
     SETWINDOWSIZE(); //阻止界面初始化时让主窗口身材变形
+
 
     //
     // create contents
@@ -50,7 +50,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.toolbarWgt,&Toolbar::sigEditorMode,this,&MainWindow::onEditorMode);
     connect(ui.toolbarWgt,&Toolbar::sigRunningMode,this,&MainWindow::onRunningMode);
     connect(ui.toolbarWgt,&Toolbar::sigFireLaunch,this,&MainWindow::fireLaunch);
-    connect(ui.launcherWgt,&LauncherItemsWgt::sigFireLaunch,this,&MainWindow::fireLaunch);
     connect(ui.toolbarWgt,&Toolbar::sigQuit,this,&MainWindow::close);
     connect(ui.toolbarWgt,&Toolbar::sigAutorunSwitching,this,[=](bool isAuto){        
         setAppAutorun(isAuto);
@@ -63,8 +62,6 @@ MainWindow::MainWindow(QWidget *parent)
     //
 
     onEditorMode();
-    ui.launcherWgt->onItemChanging();
-    ui.launcherWgt->autoLaunch();
 
     //是否启用开机自运行
     setAppAutorun( !QSettings(APPDOMAIN, QString(APPKEY)+"/run").value(AUTORUNFORBIDDEN).toBool() );
@@ -131,15 +128,14 @@ void MainWindow::onShowWindow()
 void MainWindow::createContents()
 {
     ui.toolbarWgt = new Toolbar(this);
-    ui.launcherWgt = new LauncherItemsWgt(this);
     ui.configWgt = new ConfigWgt(this);
     ui.monitorWgt = new MonitorWgt(this);
 
     ui.contentLayout = new QHBoxLayout;
-    ui.contentLayout->setContentsMargins(0,10,0,10);
-    ui.contentLayout->addWidget(ui.launcherWgt);
-    ui.contentLayout->addWidget(ui.configWgt);
-    ui.contentLayout->addWidget(ui.monitorWgt);
+    ui.contentLayout->setContentsMargins(10,10,10,10);
+    ui.contentLayout->setSpacing(12);
+    ui.contentLayout->addWidget(ui.configWgt,4);
+    ui.contentLayout->addWidget(ui.monitorWgt,3);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setMargin(0);
@@ -151,40 +147,25 @@ void MainWindow::createContents()
 
 void MainWindow::fireLaunch()
 {
-    QString key = ui.launcherWgt->currentLaucherItemKey();
-    if( key.isEmpty()==false ){
-        QStringList arguments;
-        arguments << QString("--path=%1").arg(MySettings::instance().getPathValue(key));
-        arguments << QString("--port=%1").arg(MySettings::instance().getPortValue(key));
-        arguments << QString("--allow=%1").arg(MySettings::instance().getAllowValue(key));
-        arguments << QString("--rule=%1").arg(MySettings::instance().getRuleValue(key));
-        g_chfsProcess.start(g_chfsfile,arguments);
-
-        MySettings::instance().setItemLastusedFlag(key);
-    }
+    QStringList arguments;
+    arguments << QString("--path=%1").arg(g_settings.value(PARAM_PATH).toString());
+    arguments << QString("--port=%1").arg(g_settings.value(PARAM_PORT).toString());
+    arguments << QString("--allow=%1").arg(g_settings.value(PARAM_ALLOW).toString());
+    arguments << QString("--rule=%1").arg(g_settings.value(PARAM_RULE).toString());
+    extern QString logPathRoot;
+    arguments << QString("--log=%1").arg(logPathRoot);
+    g_chfsProcess.start(g_chfsfile,arguments);
 }
 
 void MainWindow::onEditorMode()
 {
-    ui.launcherWgt->show();
-    ui.monitorWgt->hide();
-    ui.contentLayout->setStretch(0,1);
-    ui.contentLayout->setStretch(1,3);
-
     ui.configWgt->onEditorMode();
-
     ui.trayicon->setIcon(QIcon(":/APP_LOGO"));
 }
 
 void MainWindow::onRunningMode()
 {
-    ui.launcherWgt->hide();
-    ui.monitorWgt->show();
-    ui.contentLayout->setStretch(1,3);
-    ui.contentLayout->setStretch(2,2);
-
     ui.configWgt->onRunningMode();
-
     ui.trayicon->setIcon(QIcon(":/res/image/tray_running.png"));    
 }
 

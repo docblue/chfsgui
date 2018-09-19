@@ -15,5 +15,6 @@
         <file>res/image/user.svg</file>
         <file>res/image/tray_error.png</file>
         <file>res/image/tray_running.png</file>
+        <file>res/image/save.svg</file>
     </qresource>
 </RCC>
