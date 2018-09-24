@@ -48,14 +48,18 @@ public slots:
 };
 
 
-
+class QMenu;
 class LogWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit LogWidget(QWidget *parent = 0);
     void paintEvent(QPaintEvent *) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
     QListWidget* logList;
+private:
+    void createActions();
+    QMenu* menu;
 signals:
 
 public slots:

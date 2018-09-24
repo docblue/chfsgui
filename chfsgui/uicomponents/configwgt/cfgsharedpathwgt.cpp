@@ -67,6 +67,6 @@ void CfgSharedpathWgt::onPathChanging()
             g_settings.setValue(PARAM_PATH, dir);
         }
     }else{
-        QDesktopServices::openUrl(QUrl(_editPath->text()));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(_editPath->text()));
     }
 }

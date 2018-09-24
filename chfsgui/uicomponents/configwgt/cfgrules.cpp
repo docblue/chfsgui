@@ -15,7 +15,6 @@ CfgRules::CfgRules(QWidget *parent) : CfgBase(parent)
 {
     createContents();
 
-    initAccList();
 
     //
     // connections
@@ -52,6 +51,10 @@ CfgRules::CfgRules(QWidget *parent) : CfgBase(parent)
             }
         }
     });
+
+    // 初始化
+
+    initAccList();
 }
 
 void CfgRules::initAccList()

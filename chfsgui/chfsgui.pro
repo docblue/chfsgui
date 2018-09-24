@@ -16,7 +16,7 @@ QTPLUGIN  += qsvg
 PRECOMPILED_HEADER = preCompile.h
 CONFIG += c++11
 
-DEFINES += "GUIVER=0"
+DEFINES += "GUIVER=1"
 
 SOURCES += main.cpp\
         mainwindow.cpp \

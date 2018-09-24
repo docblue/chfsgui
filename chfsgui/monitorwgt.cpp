@@ -3,6 +3,7 @@
 #include <QTextBrowser>
 #include <QRegularExpression>
 #include <QDesktopServices>
+#include <QMenu>
 
 LogWidget::LogWidget(QWidget *parent) : QWidget(parent)
 {
@@ -12,7 +13,7 @@ LogWidget::LogWidget(QWidget *parent) : QWidget(parent)
     logBtn->setToolTip("点击打开操作日志目录");
     connect(logBtn,&QLabel::linkActivated,[=](){
         extern QString logPathRoot;
-        QDesktopServices::openUrl(QUrl(logPathRoot));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(logPathRoot));
     });
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -20,6 +21,21 @@ LogWidget::LogWidget(QWidget *parent) : QWidget(parent)
     mainLayout->setSpacing(2);
     mainLayout->addWidget( logBtn );
     mainLayout->addWidget( logList );
+
+    createActions();
+}
+
+void LogWidget::contextMenuEvent(QContextMenuEvent *event)
+{
+    menu->exec(event->globalPos());
+}
+
+void LogWidget::createActions()
+{
+    menu = new QMenu;
+    menu->addAction(tr("清空显示"),this,[=](){
+        logList->clear();
+    });
 }
 
 void LogWidget::paintEvent(QPaintEvent *)
